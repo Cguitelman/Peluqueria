@@ -1,0 +1,93 @@
+@host = https://localhost:7184
+@token = PEGAR_TOKEN_DE_LOGIN
+
+# PRUEBA COMPLETA DE LA API REST
+# Para que los Id coincidan con los ejemplos, ejecutar sobre una base nueva.
+# Si necesitás empezar de cero, eliminá la base PeluqueriaTurnosDb de SQL Server LocalDB y volvé a iniciar la API.
+
+### 1 - Crear cliente
+POST {{host}}/api/clientes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "María",
+  "apellido": "Perez",
+  "email": "ana.perez@email.com",
+  "telefono": "1122334455"
+}
+
+### 2 - Crear profesional
+POST {{host}}/api/profesionales
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "María",
+  "apellido": "Gomez",
+  "email": "laura@peluqueria.com",
+  "especialidad": "Colorista"
+}
+
+### 3 - Crear servicio
+POST {{host}}/api/servicios
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Corte",
+  "descripcion": "Corte, lavado y peinado",
+  "duracionHoras": 0.5,
+  "precio": 15000
+}
+
+### 4 - Crear turno
+POST {{host}}/api/turnos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "clienteId": 1,
+  "profesionalId": 1,
+  "servicioId": 1,
+  "fechaHora": "2026-12-15T10:00:00"
+}
+
+### 5 - Consultar turnos
+GET {{host}}/api/turnos
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 6 - Actualizar turno
+PUT {{host}}/api/turnos/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "clienteId": 1,
+  "profesionalId": 1,
+  "servicioId": 1,
+  "fechaHora": "2026-12-15T10:30:00",
+  "estado": "Confirmado"
+}
+
+### 7 - Ver turno actualizado
+GET {{host}}/api/turnos/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 8 - Desactivar turno (borrado lógico)
+DELETE {{host}}/api/turnos/1
+Authorization: Bearer {{token}}
+
+### 9 - Desactivar servicio (borrado lógico)
+DELETE {{host}}/api/servicios/1
+Authorization: Bearer {{token}}
+
+### 10 - Desactivar profesional (borrado lógico)
+DELETE {{host}}/api/profesionales/1
+Authorization: Bearer {{token}}
+
+### 11 - Desactivar cliente (borrado lógico)
+DELETE {{host}}/api/clientes/1
+Authorization: Bearer {{token}}

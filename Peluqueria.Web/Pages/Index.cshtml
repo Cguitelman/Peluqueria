@@ -1,0 +1,95 @@
+@page
+@model Peluqueria.Web.Pages.IndexModel
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<div class="card dashboard-hero-v2">
+    <div class="dashboard-hero-row">
+        <div>
+            <div class="dashboard-date">@Model.FechaActual</div>
+            <h1>Panel de la peluquería</h1>
+            <p>Hola, <strong>@User.Identity?.Name</strong>. Este es el resumen operativo de hoy.</p>
+        </div>
+        <a asp-page="/Turnos/Index" asp-fragment="nuevo-turno" class="dashboard-primary-action">+ Nuevo turno</a>
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(Model.ErrorCarga))
+{
+    <div class="app-alert app-alert-error"><span class="alert-icon">!</span><span>@Model.ErrorCarga</span></div>
+}
+else
+{
+    <div class="stats-grid-v2">
+        <div class="stat-card-v2"><div class="stat-top"><span class="stat-label">Turnos de hoy</span><span class="stat-dot"></span></div><strong>@Model.TurnosHoy</strong><small>Total de la jornada</small></div>
+        <div class="stat-card-v2"><div class="stat-top"><span class="stat-label">Pendientes</span><span class="stat-dot" style="background:#d69e2e"></span></div><strong>@Model.TurnosPendientesHoy</strong><small>Aún sin confirmar/finalizar</small></div>
+        <div class="stat-card-v2"><div class="stat-top"><span class="stat-label">Confirmados</span><span class="stat-dot" style="background:#2f7a59"></span></div><strong>@Model.TurnosConfirmadosHoy</strong><small>Turnos confirmados</small></div>
+        <div class="stat-card-v2"><div class="stat-top"><span class="stat-label">Clientes activos</span><span class="stat-dot"></span></div><strong>@Model.ClientesActivos</strong><small>Disponibles para agendar</small></div>
+        <div class="stat-card-v2"><div class="stat-top"><span class="stat-label">Profesionales</span><span class="stat-dot"></span></div><strong>@Model.ProfesionalesActivos</strong><small>@Model.ServiciosActivos servicios activos</small></div>
+    </div>
+
+    <div class="dashboard-grid">
+        <section class="dashboard-panel">
+            <div class="dashboard-panel-head">
+                <h2>Agenda de hoy</h2>
+                <a asp-page="/Turnos/Index" class="btn btn-soft btn-sm">Ver agenda completa</a>
+            </div>
+            <div class="dashboard-panel-body">
+                @if (Model.ProximoTurno is not null)
+                {
+                    <div class="next-appointment">
+                        <div class="next-time">@Model.ProximoTurno.FechaHora.ToString("HH:mm")</div>
+                        <div class="next-copy">
+                            <strong>Próximo: @Model.ProximoTurno.Cliente</strong>
+                            <span>@Model.ProximoTurno.Servicio con @Model.ProximoTurno.Profesional · @Model.ProximoTurno.DuracionHoras.ToString("0.#") h</span>
+                        </div>
+                    </div>
+                }
+
+                @if (!Model.AgendaHoy.Any())
+                {
+                    <div class="empty-state">No hay turnos cargados para hoy.</div>
+                }
+                else
+                {
+                    <div class="table-shell">
+                        <table class="dashboard-table">
+                            <thead><tr><th>Hora</th><th>Cliente</th><th>Profesional</th><th>Servicio</th><th>Estado</th></tr></thead>
+                            <tbody>
+                            @foreach (var turno in Model.AgendaHoy)
+                            {
+                                var claseEstado = turno.Estado switch { EstadoTurno.Confirmado => "status-confirmed", EstadoTurno.Cancelado => "status-cancelled", EstadoTurno.Finalizado => "status-finished", _ => "status-pending" };
+                                <tr>
+                                    <td><strong>@turno.FechaHora.ToString("HH:mm")</strong></td>
+                                    <td>@turno.Cliente</td>
+                                    <td>@turno.Profesional</td>
+                                    <td>@turno.Servicio</td>
+                                    <td><span class="status-badge @claseEstado">@turno.Estado</span></td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <aside class="dashboard-panel">
+            <div class="dashboard-panel-head"><h2>Resumen y accesos</h2></div>
+            <div class="dashboard-panel-body">
+                <div class="mini-status-list">
+                    <div class="mini-status-row"><span>Finalizados hoy</span><strong>@Model.TurnosFinalizadosHoy</strong></div>
+                    <div class="mini-status-row"><span>Cancelados hoy</span><strong>@Model.TurnosCanceladosHoy</strong></div>
+                    <div class="mini-status-row"><span>Servicios activos</span><strong>@Model.ServiciosActivos</strong></div>
+                </div>
+                <div class="quick-grid mt-3">
+                    <a asp-page="/Clientes/Index" class="quick-action"><strong>Clientes</strong><span>Alta, filtros y estados</span></a>
+                    <a asp-page="/Profesionales/Index" class="quick-action"><strong>Profesionales</strong><span>Equipo y especialidades</span></a>
+                    <a asp-page="/Servicios/Index" class="quick-action"><strong>Servicios</strong><span>Duración y precios</span></a>
+                    <a asp-page="/Turnos/Index" class="quick-action"><strong>Turnos</strong><span>Agenda y gestión</span></a>
+                </div>
+            </div>
+        </aside>
+    </div>
+}

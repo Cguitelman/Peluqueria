@@ -1,0 +1,66 @@
+@page
+@model Peluqueria.Web.Pages.Profesionales.IndexModel
+@{
+    ViewData["Title"] = "Profesionales";
+    var esAdmin = User.IsInRole("Administrador");
+}
+<div class="page-header"><div><h1>Profesionales</h1><p>Equipo, especialidades y disponibilidad en el sistema.</p></div></div>
+@if (esAdmin)
+{
+<div class="panel">
+    <div class="panel-title"><h2>Nuevo profesional</h2><span>Solo administradores pueden modificar esta sección.</span></div>
+    <form method="post" asp-page-handler="Crear">
+        <div asp-validation-summary="All" class="error"></div>
+        <div class="grid">
+            <div class="field"><label asp-for="Nuevo.Nombre"></label><input asp-for="Nuevo.Nombre" /><span asp-validation-for="Nuevo.Nombre" class="error"></span></div>
+            <div class="field"><label asp-for="Nuevo.Apellido"></label><input asp-for="Nuevo.Apellido" /><span asp-validation-for="Nuevo.Apellido" class="error"></span></div>
+            <div class="field"><label asp-for="Nuevo.Email"></label><input asp-for="Nuevo.Email" /><span asp-validation-for="Nuevo.Email" class="error"></span></div>
+            <div class="field"><label asp-for="Nuevo.Especialidad"></label><input asp-for="Nuevo.Especialidad" /><span asp-validation-for="Nuevo.Especialidad" class="error"></span></div>
+        </div>
+        <div class="mt-3"><button class="btn btn-brand" type="submit">Crear profesional</button></div>
+    </form>
+</div>
+}
+else
+{
+    <div asp-validation-summary="All" class="error"></div>
+}
+<div class="panel filter-panel">
+    <div class="panel-title"><h2>Filtros</h2><span>Podés combinar los campos.</span></div>
+    <form method="get">
+        <div class="filter-grid">
+            <div class="field"><label asp-for="FiltroNombre">Nombre</label><input asp-for="FiltroNombre" /></div>
+            <div class="field"><label asp-for="FiltroApellido">Apellido</label><input asp-for="FiltroApellido" /></div>
+            <div class="field"><label asp-for="FiltroEspecialidad">Especialidad</label><input asp-for="FiltroEspecialidad" placeholder="Ej. Colorista" /></div>
+            <div class="field"><label asp-for="FiltroRegistro">Estado del registro</label><select asp-for="FiltroRegistro"><option>Todos</option><option>Activos</option><option>Inactivos</option></select></div>
+        </div>
+        <div class="filter-actions"><button class="btn btn-brand" type="submit">Filtrar</button><a asp-page="./Index" class="btn btn-soft">Limpiar</a></div>
+    </form>
+</div>
+<div class="table-shell"><table>
+    <thead><tr><th>Profesional</th><th>Email</th><th>Especialidad</th><th>Estado</th>@if(esAdmin){<th>Acciones</th>}</tr></thead>
+    <tbody>
+    @if (!Model.Profesionales.Any()) { <tr><td colspan="5" class="empty-state">No se encontraron profesionales con esos filtros.</td></tr> }
+    @foreach (var item in Model.Profesionales)
+    {
+        <tr class="@(item.Activo ? "" : "inactive-row")">
+            <td><strong>@item.NombreCompleto</strong></td><td>@item.Email</td><td>@item.Especialidad</td>
+            <td><span class="status-badge @(item.Activo ? "status-active" : "status-inactive")">@(item.Activo ? "Activo" : "Inactivo")</span></td>
+            @if(esAdmin)
+            {
+                <td class="actions">
+                    @if(item.Activo)
+                    {
+                        <a asp-page="Editar" asp-route-id="@item.Id" class="btn btn-sm btn-secondary">Editar</a>
+                        <form method="post" asp-page-handler="Eliminar" asp-route-id="@item.Id" data-confirm="¿Querés desactivar este profesional?"><button class="btn btn-sm btn-danger" type="submit">Desactivar</button></form>
+                    }
+                    else
+                    {
+                        <form method="post" asp-page-handler="Activar" asp-route-id="@item.Id"><button class="btn btn-sm btn-success" type="submit">Activar</button></form>
+                    }
+                </td>
+            }
+        </tr>
+    }
+    </tbody>
+</table></div>

@@ -1,0 +1,61 @@
+@page
+@model Peluqueria.Web.Pages.Clientes.IndexModel
+@{
+    ViewData["Title"] = "Clientes";
+}
+<div class="page-header">
+    <div><h1>Clientes</h1><p>Alta y gestión de clientes de la peluquería.</p></div>
+</div>
+<div class="panel">
+    <div class="panel-title"><h2>Nuevo cliente</h2><span>Los campos son obligatorios.</span></div>
+    <form method="post" asp-page-handler="Crear">
+        <div asp-validation-summary="All" class="error"></div>
+        <div class="grid">
+            <div class="field"><label asp-for="Nuevo.Nombre"></label><input asp-for="Nuevo.Nombre" /><span asp-validation-for="Nuevo.Nombre" class="error"></span></div>
+            <div class="field"><label asp-for="Nuevo.Apellido"></label><input asp-for="Nuevo.Apellido" /><span asp-validation-for="Nuevo.Apellido" class="error"></span></div>
+            <div class="field"><label asp-for="Nuevo.Email"></label><input asp-for="Nuevo.Email" /><span asp-validation-for="Nuevo.Email" class="error"></span></div>
+            <div class="field"><label asp-for="Nuevo.Telefono"></label><input asp-for="Nuevo.Telefono" /><span asp-validation-for="Nuevo.Telefono" class="error"></span></div>
+        </div>
+        <div class="mt-3"><button class="btn btn-brand" type="submit">Crear cliente</button></div>
+    </form>
+</div>
+<div class="panel filter-panel">
+    <div class="panel-title"><h2>Filtros</h2><span>Buscá por coincidencia parcial y estado.</span></div>
+    <form method="get">
+        <div class="filter-grid">
+            <div class="field"><label asp-for="FiltroNombre">Nombre</label><input asp-for="FiltroNombre" placeholder="Ej. Ana" /></div>
+            <div class="field"><label asp-for="FiltroApellido">Apellido</label><input asp-for="FiltroApellido" placeholder="Ej. Pérez" /></div>
+            <div class="field">
+                <label asp-for="FiltroRegistro">Estado del registro</label>
+                <select asp-for="FiltroRegistro"><option>Todos</option><option>Activos</option><option>Inactivos</option></select>
+            </div>
+        </div>
+        <div class="filter-actions"><button class="btn btn-brand" type="submit">Filtrar</button><a asp-page="./Index" class="btn btn-soft">Limpiar</a></div>
+    </form>
+</div>
+<div class="table-shell">
+<table>
+    <thead><tr><th>Cliente</th><th>Email</th><th>Teléfono</th><th>Estado</th><th>Acciones</th></tr></thead>
+    <tbody>
+    @if (!Model.Clientes.Any()) { <tr><td colspan="5" class="empty-state">No se encontraron clientes con esos filtros.</td></tr> }
+    @foreach (var item in Model.Clientes)
+    {
+        <tr class="@(item.Activo ? "" : "inactive-row")">
+            <td><strong>@item.NombreCompleto</strong></td><td>@item.Email</td><td>@item.Telefono</td>
+            <td><span class="status-badge @(item.Activo ? "status-active" : "status-inactive")">@(item.Activo ? "Activo" : "Inactivo")</span></td>
+            <td class="actions">
+                @if (item.Activo)
+                {
+                    <a asp-page="Editar" asp-route-id="@item.Id" class="btn btn-sm btn-secondary">Editar</a>
+                    <form method="post" asp-page-handler="Eliminar" asp-route-id="@item.Id" data-confirm="¿Querés desactivar este cliente?"><button class="btn btn-sm btn-danger" type="submit">Desactivar</button></form>
+                }
+                else
+                {
+                    <form method="post" asp-page-handler="Activar" asp-route-id="@item.Id"><button class="btn btn-sm btn-success" type="submit">Activar</button></form>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+</div>

@@ -1,0 +1,8 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+Peluqueria.Api/peluqueria.db
+Peluqueria.Api/peluqueria.db-shm
+Peluqueria.Api/peluqueria.db-wal

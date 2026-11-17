@@ -1,0 +1,24 @@
+@page
+@model Peluqueria.Web.Pages.Cuenta.LoginModel
+@{
+    ViewData["Title"] = "Ingresar";
+}
+<div class="login card">
+    <div class="login-brand">P</div>
+    <h1>Ingresar</h1>
+    <p class="muted">Accedé al sistema de turnos con tu usuario y contraseña.</p>
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="error"></div>
+        <div class="field mb-3">
+            <label asp-for="Input.Usuario">Usuario</label>
+            <input asp-for="Input.Usuario" autocomplete="username" />
+            <span asp-validation-for="Input.Usuario" class="error"></span>
+        </div>
+        <div class="field mb-3">
+            <label asp-for="Input.Password">Contraseña</label>
+            <input asp-for="Input.Password" autocomplete="current-password" />
+            <span asp-validation-for="Input.Password" class="error"></span>
+        </div>
+        <button type="submit" class="btn btn-brand w-100">Ingresar</button>
+    </form>
+</div>

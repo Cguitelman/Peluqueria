@@ -1,0 +1,47 @@
+@host = https://localhost:7184
+@token = PEGAR_TOKEN_DE_LOGIN
+
+### PROFESIONALES - crear
+POST {{host}}/api/profesionales
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Laura",
+  "apellido": "Gomez",
+  "email": "laura@peluqueria.com",
+  "especialidad": "Colorista"
+}
+
+### PROFESIONALES - listar
+GET {{host}}/api/profesionales
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### PROFESIONALES - obtener por id
+# Cliente y Profesional ahora son tablas independientes.
+# En una base nueva, el primer profesional tiene id 1.
+GET {{host}}/api/profesionales/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### PROFESIONALES - actualizar
+PUT {{host}}/api/profesionales/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Jose",
+  "apellido": "Gomez",
+  "email": "laura@peluqueria.com",
+  "especialidad": "Colorista y corte"
+}
+
+### PROFESIONALES - desactivar (borrado lógico)
+# El registro permanece en la base con Activo = false.
+DELETE {{host}}/api/profesionales/1
+Authorization: Bearer {{token}}
+
+### Filtrar profesionales
+GET {{host}}/api/profesionales?nombre=Juan&especialidad=Colorista&incluirInactivos=true
+Authorization: Bearer {{token}}

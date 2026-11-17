@@ -1,0 +1,57 @@
+@host = https://localhost:7184
+@token = PEGAR_TOKEN_DE_LOGIN
+
+### TURNOS - crear
+# Antes ejecutar los POST de 01_Clientes, 02_Profesionales y 03_Servicios.
+# Cambiar la fecha si al momento de probar ya no es futura.
+POST {{host}}/api/turnos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "clienteId": 1,
+  "profesionalId": 1,
+  "servicioId": 1,
+  "fechaHora": "2026-12-15T10:00:00"
+}
+
+### TURNOS - listar
+GET {{host}}/api/turnos
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### TURNOS - obtener por id
+GET {{host}}/api/turnos/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### TURNOS - filtrar por estado
+GET {{host}}/api/turnos?estado=Pendiente
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### TURNOS - filtrar por profesional
+GET {{host}}/api/turnos?profesionalId=1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### TURNOS - actualizar y confirmar
+PUT {{host}}/api/turnos/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "clienteId": 1,
+  "profesionalId": 1,
+  "servicioId": 1,
+  "fechaHora": "2026-12-15T10:30:00",
+  "estado": "Confirmado"
+}
+
+### TURNOS - desactivar (borrado lógico)
+DELETE {{host}}/api/turnos/1
+Authorization: Bearer {{token}}
+
+### Filtrar turnos por cliente, profesional, servicio, fechas y estado
+GET {{host}}/api/turnos?cliente=Ana&profesional=Juan&servicio=Corte&fechaDesde=2026-09-01&fechaHasta=2026-09-30&estado=Confirmado&incluirInactivos=true
+Authorization: Bearer {{token}}

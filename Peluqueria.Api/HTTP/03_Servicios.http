@@ -1,0 +1,45 @@
+@host = https://localhost:7184
+@token = PEGAR_TOKEN_DE_LOGIN
+
+### SERVICIOS - crear
+POST {{host}}/api/servicios
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Corte",
+  "descripcion": "Corte, lavado y peinado",
+  "duracionHoras": 0.5,
+  "precio": 15000
+}
+
+### SERVICIOS - listar
+GET {{host}}/api/servicios
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### SERVICIOS - obtener por id
+GET {{host}}/api/servicios/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### SERVICIOS - actualizar
+PUT {{host}}/api/servicios/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Corte Premium",
+  "descripcion": "Corte, lavado, tratamiento y peinado",
+  "duracionHoras": 1,
+  "precio": 18000
+}
+
+### SERVICIOS - desactivar (borrado lógico)
+# El registro permanece en la base con Activo = false.
+DELETE {{host}}/api/servicios/1
+Authorization: Bearer {{token}}
+
+### Filtrar servicios por nombre
+GET {{host}}/api/servicios?nombre=Corte&incluirInactivos=true
+Authorization: Bearer {{token}}

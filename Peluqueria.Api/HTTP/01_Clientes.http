@@ -1,0 +1,46 @@
+@host = https://localhost:7184
+@token = PEGAR_TOKEN_DE_LOGIN
+
+### CLIENTES - crear
+POST {{host}}/api/clientes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "María",
+  "apellido": "Perez",
+  "email": "ana.perez@email.com",
+  "telefono": "1122334455"
+}
+
+### CLIENTES - listar
+GET {{host}}/api/clientes
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### CLIENTES - obtener por id
+# En una base nueva, el primer cliente creado tiene id 1.
+GET {{host}}/api/clientes/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### CLIENTES - actualizar
+PUT {{host}}/api/clientes/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Ana Maria",
+  "apellido": "Perez",
+  "email": "ana.actualizada@email.com",
+  "telefono": "1199999999"
+}
+
+### CLIENTES - desactivar (borrado lógico)
+# El registro permanece en la base con Activo = false.
+DELETE {{host}}/api/clientes/2
+Authorization: Bearer {{token}}
+
+### Filtrar clientes por nombre y apellido
+GET {{host}}/api/clientes?nombre=Ana&apellido=Perez&incluirInactivos=true
+Authorization: Bearer {{token}}

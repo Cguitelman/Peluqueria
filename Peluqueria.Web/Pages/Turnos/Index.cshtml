@@ -1,0 +1,128 @@
+@page
+@model Peluqueria.Web.Pages.Turnos.IndexModel
+@{
+    ViewData["Title"] = "Turnos";
+}
+<div class="page-header"><div><h1>Turnos</h1><p>Agenda de clientes, profesionales y servicios.</p></div></div>
+<div class="panel" id="nuevo-turno">
+    <div class="panel-title"><h2>Nuevo turno</h2><span>Horario de atención: @Model.HorarioAtencion. Inicios cada @Model.IntervaloMinutos minutos.</span></div>
+    <form method="post" asp-page-handler="Crear">
+        <div asp-validation-summary="All" class="error"></div>
+        <div class="grid">
+            <div class="field"><label asp-for="Nuevo.ClienteId">Cliente</label><select asp-for="Nuevo.ClienteId"><option value="">Seleccionar...</option>@foreach (var c in Model.Clientes) { <option value="@c.Id">@c.NombreCompleto</option> }</select><span asp-validation-for="Nuevo.ClienteId" class="error"></span></div>
+            <div class="field"><label asp-for="Nuevo.ProfesionalId">Profesional</label><select asp-for="Nuevo.ProfesionalId"><option value="">Seleccionar...</option>@foreach (var p in Model.Profesionales) { <option value="@p.Id">@p.NombreCompleto - @p.Especialidad</option> }</select><span asp-validation-for="Nuevo.ProfesionalId" class="error"></span></div>
+            <div class="field"><label asp-for="Nuevo.ServicioId">Servicio</label><select asp-for="Nuevo.ServicioId" id="servicioSelect"><option value="" data-duration="0">Seleccionar...</option>@foreach (var s in Model.Servicios) { <option value="@s.Id" data-duration="@s.DuracionHoras.ToString(System.Globalization.CultureInfo.InvariantCulture)">@s.Nombre (@s.DuracionHoras.ToString("0.#") h)</option> }</select><span asp-validation-for="Nuevo.ServicioId" class="error"></span></div>
+            <div class="field">
+                <label>Fecha y hora</label>
+                <div class="date-time-grid">
+                    <div>
+                        <input asp-for="FechaSeleccionada" type="date" min="@Model.FechaMin" id="fechaTurno" />
+                        <span asp-validation-for="FechaSeleccionada" class="error"></span>
+                    </div>
+                    <div>
+                        <select asp-for="HoraSeleccionada" id="horaTurno">
+                            @foreach (var hora in Model.HorariosDisponibles)
+                            {
+                                <option value="@hora">@hora</option>
+                            }
+                        </select>
+                        <span asp-validation-for="HoraSeleccionada" class="error"></span>
+                    </div>
+                </div>
+                <span class="slot-note">Sólo se muestran horarios dentro de @Model.HorarioAtencion. Los horarios pasados de hoy se bloquean automáticamente.</span>
+            </div>
+        </div>
+        <div class="mt-3"><button class="btn btn-brand" type="submit">Crear turno</button></div>
+    </form>
+</div>
+<div class="panel filter-panel">
+    <div class="panel-title"><h2>Filtros de agenda</h2><span>Todos son opcionales y se pueden combinar.</span></div>
+    <form method="get">
+        <div asp-validation-summary="All" class="error"></div>
+        <div class="filter-grid filter-grid-wide">
+            <div class="field"><label asp-for="FiltroCliente">Cliente</label><input asp-for="FiltroCliente" placeholder="Nombre o apellido" /></div>
+            <div class="field"><label asp-for="FiltroProfesional">Profesional</label><input asp-for="FiltroProfesional" placeholder="Nombre o apellido" /></div>
+            <div class="field"><label asp-for="FiltroServicio">Servicio</label><input asp-for="FiltroServicio" placeholder="Ej. Corte" /></div>
+            <div class="field"><label asp-for="FechaDesde">Desde</label><input asp-for="FechaDesde" type="date" /></div>
+            <div class="field"><label asp-for="FechaHasta">Hasta</label><input asp-for="FechaHasta" type="date" /></div>
+            <div class="field"><label asp-for="FiltroEstado">Estado turno</label><select asp-for="FiltroEstado"><option value="">Todos</option>@foreach (var estado in Enum.GetValues<EstadoTurno>()) { <option value="@estado">@estado</option> }</select></div>
+            <div class="field"><label asp-for="FiltroRegistro">Estado registro</label><select asp-for="FiltroRegistro"><option>Todos</option><option>Activos</option><option>Inactivos</option></select></div>
+        </div>
+        <div class="filter-actions"><button class="btn btn-brand" type="submit">Filtrar</button><a asp-page="./Index" class="btn btn-soft">Limpiar</a></div>
+    </form>
+</div>
+<div class="table-shell"><table>
+    <thead><tr><th>Fecha</th><th>Cliente</th><th>Profesional</th><th>Servicio</th><th>Estado turno</th><th>Registro</th><th>Acciones</th></tr></thead>
+    <tbody>
+    @if (!Model.Turnos.Any()) { <tr><td colspan="7" class="empty-state">No se encontraron turnos con esos filtros.</td></tr> }
+    @foreach (var item in Model.Turnos)
+    {
+        var claseEstado = item.Estado switch { EstadoTurno.Confirmado => "status-confirmed", EstadoTurno.Cancelado => "status-cancelled", EstadoTurno.Finalizado => "status-finished", _ => "status-pending" };
+        <tr class="@(item.Activo ? "" : "inactive-row")">
+            <td><strong>@item.FechaHora.ToString("dd/MM/yyyy")</strong><br/><span class="muted">@item.FechaHora.ToString("HH:mm")</span></td>
+            <td>@item.Cliente</td><td>@item.Profesional</td><td>@item.Servicio <span class="muted">· @item.DuracionHoras.ToString("0.#") h</span></td>
+            <td><span class="status-badge @claseEstado">@item.Estado</span></td>
+            <td><span class="status-badge @(item.Activo ? "status-active" : "status-inactive")">@(item.Activo ? "Activo" : "Inactivo")</span></td>
+            <td class="actions">
+                @if(item.Activo)
+                {
+                    <a asp-page="Editar" asp-route-id="@item.Id" class="btn btn-sm btn-secondary">Editar</a>
+                    <form method="post" asp-page-handler="Eliminar" asp-route-id="@item.Id" data-confirm="¿Querés desactivar este turno?"><button class="btn btn-sm btn-danger" type="submit">Desactivar</button></form>
+                }
+                else
+                {
+                    <form method="post" asp-page-handler="Activar" asp-route-id="@item.Id"><button class="btn btn-sm btn-success" type="submit">Activar</button></form>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table></div>
+
+@section Scripts {
+<script>
+(() => {
+    const fecha = document.getElementById('fechaTurno');
+    const hora = document.getElementById('horaTurno');
+    const servicio = document.getElementById('servicioSelect');
+    const aperturaMin = @Model.HoraApertura * 60;
+    const cierreMin = @Model.HoraCierre * 60;
+
+    function fechaLocalISO(date) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    function ajustarHorarios() {
+        if (!fecha || !hora) return;
+        const ahora = new Date();
+        const hoy = fechaLocalISO(ahora);
+        const esHoy = fecha.value === hoy;
+        const duracion = parseFloat(servicio?.selectedOptions?.[0]?.dataset.duration || '0');
+        const duracionMin = Math.round(duracion * 60);
+        let primeraValida = null;
+
+        [...hora.options].forEach(option => {
+            const [h, m] = option.value.split(':').map(Number);
+            const minutos = h * 60 + m;
+            const pasado = esHoy && minutos <= (ahora.getHours() * 60 + ahora.getMinutes());
+            const fueraPorDuracion = duracionMin > 0 && minutos + duracionMin > cierreMin;
+            const fueraHorario = minutos < aperturaMin || minutos >= cierreMin;
+            option.disabled = pasado || fueraPorDuracion || fueraHorario;
+            if (!option.disabled && primeraValida === null) primeraValida = option.value;
+        });
+
+        const seleccionada = hora.options[hora.selectedIndex];
+        if ((!seleccionada || seleccionada.disabled) && primeraValida !== null) hora.value = primeraValida;
+    }
+
+    const hoy = fechaLocalISO(new Date());
+    if (fecha) fecha.min = hoy;
+    fecha?.addEventListener('change', ajustarHorarios);
+    servicio?.addEventListener('change', ajustarHorarios);
+    ajustarHorarios();
+})();
+</script>
+}

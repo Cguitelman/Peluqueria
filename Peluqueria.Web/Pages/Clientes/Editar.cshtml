@@ -1,0 +1,19 @@
+@page "{id:int}"
+@model Peluqueria.Web.Pages.Clientes.EditarModel
+@{
+    ViewData["Title"] = "Editar cliente";
+}
+<div class="page-header"><div><h1>Editar cliente</h1><p>Actualizá los datos de contacto.</p></div></div>
+<div class="panel">
+    <form method="post">
+        <input type="hidden" asp-for="Id" />
+        <div asp-validation-summary="ModelOnly" class="error"></div>
+        <div class="grid">
+            <div class="field"><label asp-for="Input.Nombre"></label><input asp-for="Input.Nombre" /></div>
+            <div class="field"><label asp-for="Input.Apellido"></label><input asp-for="Input.Apellido" /></div>
+            <div class="field"><label asp-for="Input.Email"></label><input asp-for="Input.Email" /></div>
+            <div class="field"><label asp-for="Input.Telefono"></label><input asp-for="Input.Telefono" /></div>
+        </div>
+        <div class="mt-3 actions"><button class="btn btn-brand" type="submit">Guardar cambios</button><a asp-page="Index" class="btn btn-soft">Cancelar</a></div>
+    </form>
+</div>
